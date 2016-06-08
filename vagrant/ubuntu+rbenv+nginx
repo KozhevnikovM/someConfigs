@@ -1,0 +1,33 @@
+Vagrant.configure(2) do |config|
+  config.vm.box = "ubuntu/trusty64"
+  config.vm.box_check_update = false
+  config.vm.network "forwarded_port", guest: 80, host: 8080
+  config.vm.network "forwarded_port", guest: 4000, host: 4000
+  config.vm.synced_folder "data", "/vagrant_data"
+
+
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+   config.vm.provision "shell", inline: <<-SHELL
+     sudo apt-get update
+     sudo apt-get upgrade -y
+     sudo apt-get install -y gem
+     sudo apt-get install -y nginx
+	 #Begin install rbenv+ruby
+	 sudo apt-get install git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev python-software-properties libffi-dev
+	 cd
+	 git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+	 echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+	 echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+	 exec $SHELL
+	 git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+	 echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bashrc
+	 exec $SHELL
+	 git clone https://github.com/rbenv/rbenv-gem-rehash.git ~/.rbenv/plugins/rbenv-gem-rehash
+	 rbenv install 2.3.1
+	 rbenv global 2.3.1
+	 #end install rbenv+ruby
+	 gem install bundler
+  SHELL
+end
